@@ -5,8 +5,7 @@
 }
 
 body {
-  /*background: url("../src/assets/images/bee-background.jpg") no-repeat center center fixed; */
-  background-color: #666666;
+  background: url("../src/assets/images/attack.webp") no-repeat center center fixed;
   background-size: cover;
   font-family: "Roboto", sans-serif;
   justify-content: center;
@@ -15,7 +14,7 @@ body {
 }
 
 .container {
-  background: rgba(255, 255, 255, 0.062);
+  background: rgba(232, 220, 220, 0.062);
   border-radius: 15px;
   backdrop-filter: blur(15px);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
@@ -26,7 +25,7 @@ body {
 }
 
 h1 {
-  color: #ffcc00;
+  color: #6b4701;
   margin-bottom: 20px;
 }
 
@@ -38,7 +37,9 @@ h1 {
 }
 
 .player-info label {
-  color: #ffcc00;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 16px;
   margin: 10px 0;
 }
 
