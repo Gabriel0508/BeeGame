@@ -14,8 +14,7 @@ export class BeeGame {
 
   public hitBee(): string {
     const aliveBees = this.bees.filter((bee) => bee.health > 0);
-    console.log(aliveBees);
-    
+
     if (aliveBees.length === 0) {
       return "Game Over";
     }
@@ -34,7 +33,7 @@ export class BeeGame {
 
     // Apply damage and ensure health does not go below zero
     bee.health = Math.max(0, bee.health - damage);
-    const gameOverMessage =  this.checkIfGameOver();
+    const gameOverMessage = this.checkIfGameOver();
     if (gameOverMessage) {
       return gameOverMessage;
     }
@@ -47,6 +46,20 @@ export class BeeGame {
       type: bee.constructor.name,
       health: bee.health,
     }));
+  }
+
+  public getBeesByType() {
+    return this.bees.reduce((acc, bee) => {
+      const type = bee.constructor.name;
+      if (!acc[type]) {
+        acc[type] = { count: 0, bees: [] };
+      }
+      if (bee.health > 0) {
+        acc[type].count += 1;
+      }
+      acc[type].bees.push({ health: bee.health });
+      return acc;
+    }, {} as Record<string, { count: number; bees: { health: number }[] }>);
   }
 
   private initializeBees() {

@@ -1,10 +1,7 @@
-* {
+body {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-}
-
-body {
   background: url("../src/assets/images/attack.webp") no-repeat center center fixed;
   background-size: cover;
   font-family: "Roboto", sans-serif;
@@ -69,8 +66,8 @@ input[type="text"]:focus {
   text-align: center;
   margin-bottom: 20px;
   font-size: 16px;
-  color: #f0f0f0;
-  font-weight: 500;
+  color: #111;
+  font-weight: 600;
 }
 
 .game-buttons {
