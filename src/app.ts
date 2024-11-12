@@ -7,7 +7,7 @@ let game: BeeGame;
 Elements.hitButton.addEventListener("click", handleHitButtonClick);
 Elements.resetButton.addEventListener("click", resetGame);
 
-function handleHitButtonClick() {
+export function handleHitButtonClick() {
   const playerName = Elements.playerNameValue.value || "Player";
 
   if (!game) {
@@ -36,15 +36,12 @@ export function processHit() {
     updateBeeList();
   }
 
-  if (Elements.statusList.children.length > 0) {
-    Elements.statusDiv.style.display = "block";
-  } else {
-    Elements.statusDiv.style.display = "none";
-  }
+  Elements.statusDiv.style.display =
+    Elements.statusList.children.length > 0 ? "block" : "none";
 }
 
 export function isGameOver(resultMessage: string) {
-  return resultMessage.includes("Game Over");
+  return resultMessage && resultMessage.includes("Game Over");
 }
 
 export function resetGame() {
@@ -62,20 +59,22 @@ export function resetGame() {
 
 export function updateBeeList() {
   Elements.statusList.innerHTML = "";
-  if(!game) {
-    return
+  if (!game) {
+    return;
   }
   const beesByType = game.getBeesByType();
-  for (const [type, { count, bees }] of Object.entries(beesByType)) {
-    const typeHeader = document.createElement("h3");
-    typeHeader.style.color = "#6b4701";
-    typeHeader.textContent = `${type}s (${count})`;
-    Elements.statusList.appendChild(typeHeader);
+  if (beesByType) {
+    for (const [type, { count, bees }] of Object.entries(beesByType)) {
+      const typeHeader = document.createElement("h3");
+      typeHeader.style.color = "#6b4701";
+      typeHeader.textContent = `${type}s (${count})`;
+      Elements.statusList.appendChild(typeHeader);
 
-    bees.forEach((bee) => {
-      const listItem = document.createElement("li");
-      listItem.textContent = `${type} : ${bee.health} HP`;
-      Elements.statusList.appendChild(listItem);
-    });
+      bees.forEach((bee) => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${type} : ${bee.health} HP`;
+        Elements.statusList.appendChild(listItem);
+      });
+    }
   }
 }

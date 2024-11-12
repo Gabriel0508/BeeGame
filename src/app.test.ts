@@ -1,96 +1,90 @@
+import {
+  handleHitButtonClick,
+  isGameOver,
+  processHit,
+  resetGame,
+  startNewGame,
+  updateBeeList,
+} from "./app";
 import { BeeGame } from "./beeGame";
-import { gameTitle, hitButton, playerInfo } from "./elements";
-import { isGameOver, processHit, resetGame, startNewGame, updateBeeList } from "./app";
 import * as Elements from "./elements";
 
 jest.mock("./elements", () => ({
-  hitButton: {
-    addEventListener: jest.fn(),
-    innerHTML: "Start Game",
-    disabled: false,
-  },
-  resetButton: {
-    addEventListener: jest.fn(),
-    style: { display: "none" },
-  },
-  statusGame: { innerHTML: "" },
-  statusList: {
-    children: { length: 0 },
-    innerHTML: "",
-    appendChild: jest.fn(),
-  },
-  statusDiv: { style: { display: "" } },
-  playerNameValue: { value: "Test Player" },
-  mainContainer: {},
-  gameTitle: { innerHTML: "" },
-  playerInfo: { style: { display: "none" } },
-  typeHeader: { innerHTML: "50 Queen" },
+  hitButton: document.createElement("button"),
+  resetButton: document.createElement("button"),
+  statusGame: document.createElement("div"),
+  playerNameValue: document.createElement("input"),
+  mainContainer: document.createElement("div"),
+  gameTitle: document.createElement("div"),
+  playerInfo: document.createElement("div"),
+  statusDiv: document.createElement("div"),
+  statusTitle: document.createElement("h2"),
+  statusList: document.createElement("ul"),
 }));
 
-// Create a mock game instance
-let mockGame = new BeeGame("Player");
-const mockHitBee = jest.fn();
-jest.spyOn(mockGame, "getBeesByType").mockReturnValue({
-  Queen: { count: 1, bees: [{ health: 50 }] },
-  Worker: { count: 5, bees: [{ health: 20 }, { health: 0 }] },
-  Drone: { count: 3, bees: [{ health: 10 }, { health: 0 }, { health: 5 }] },
-});
-mockGame.hitBee = mockHitBee;
+jest.mock("../src/beeGame");
 
-describe("App", () => {
+describe("App functions", () => {
+  let game: jest.Mocked<BeeGame>;
+
   beforeEach(() => {
-    jest.clearAllMocks();
+    game = new BeeGame("Player") as jest.Mocked<BeeGame>;
+    Elements.hitButton.innerHTML = "Hit";
+    Elements.resetButton.style.display = "none";
+    Elements.statusDiv.appendChild(Elements.statusTitle);
+    Elements.statusDiv.appendChild(Elements.statusList);
+    Elements.mainContainer.appendChild(Elements.statusDiv);
+
+    game = {
+      hitBee: jest.fn(),
+      getBeesByType: jest.fn(),
+    } as any;
   });
 
-  it("should initialize a new game with player name update UI", () => {
-    startNewGame("Test Player");
-    expect(gameTitle.innerHTML).toBe(
-      "Welcome, Test Player! Click the button to hit a bee."
-    );
-    expect(hitButton.innerHTML).toBe("Hit");
-    expect(playerInfo.style.display).toBe("none");
+  it("should initialize statusDiv correctly", () => {
+    expect(Elements.statusDiv).toBeDefined();
+    expect(Elements.mainContainer.contains(Elements.statusDiv)).toBe(true);
+  });
+
+  describe("startNewGame", () => {
+    it("should initialize the game and update the UI", () => {
+      startNewGame("Test Player");
+
+      expect(Elements.playerInfo.style.display).toBe("none");
+      expect(Elements.gameTitle.innerHTML).toContain("Welcome, Test Player!");
+      expect(Elements.hitButton.innerHTML).toBe("Hit");
+    });
   });
 
   describe("processHit", () => {
-    it("should display message", () => {
-      jest.spyOn(mockGame, "hitBee").mockReturnValueOnce(null);
+    it("should not update statusDiv if no bees are present", () => {
+      game.hitBee.mockReturnValue("Test Player hit a Worker for 10 damage!");
+      game.getBeesByType.mockReturnValue({
+        Worker: { count: 0, bees: [] },
+      });
+
       processHit();
-
-     // expect(Elements.statusGame.innerHTML).toBe("");
-      //expect(Elements.hitButton.classList.contains('disabled')).toBeTruthy();
-      expect(Elements.hitButton.disabled).toBe(false);
-      expect(Elements.resetButton.style.display).toBe("none");
-    });
-
-    it("should update bee list if game is not over", () => {
-      jest.spyOn(mockGame, "hitBee").mockReturnValueOnce("Test Player hit a Drone for 12 damage!");
-      processHit();
-
-     // expect(Elements.statusGame.innerHTML).toBe("Test Player hit a Drone for 12 damage!");
       expect(Elements.statusDiv.style.display).toBe("none");
     });
   });
 
-  describe("isGameOver", () => {
-    it("should return true if the message includes 'Game Over'", () => {
-      const result = isGameOver("Game Over");
-      expect(result).toBe(true);
+  describe("isGameOver function", () => {
+    it("should return true if the result message includes 'Game Over'", () => {
+      expect(isGameOver("Game Over! All bees are dead!")).toBe(true);
     });
 
-    it("should return false if the message does not include 'Game Over'", () => {
-      const result = isGameOver("Hit success");
-      expect(result).toBe(false);
+    it("should return false if the result message does not include 'Game Over'", () => {
+      expect(isGameOver("Test Player hit a Worker for 10 damage!")).toBe(false);
     });
   });
 
   describe("resetGame", () => {
-    it("should reset game and update DOM elements", () => {
+    it("should reset game state and UI elements", () => {
       resetGame();
 
-      expect(mockGame).toBeNull();
       expect(Elements.statusGame.innerHTML).toBe("");
       expect(Elements.playerNameValue.value).toBe("");
-    //  expect(Elements.hitButton.classList.contains('disabled')).toBeFalsy();
+      expect(Elements.hitButton.classList.contains("disabled")).toBe(false);
       expect(Elements.hitButton.disabled).toBe(false);
       expect(Elements.hitButton.innerHTML).toBe("New Game");
       expect(Elements.resetButton.style.display).toBe("none");
@@ -101,23 +95,23 @@ describe("App", () => {
   });
 
   describe("updateBeeList", () => {
-    it("should update statusList with correct bee types and health", () => {
-      mockGame.getBeesByType 
-
+    it("should not update list if game is null", () => {
+      game = null as unknown as jest.Mocked<BeeGame>;
       updateBeeList();
 
-      
-      expect(Elements.statusList.appendChild).toHaveBeenCalledTimes(0); //verify 
-      //expect(Elements.statusList.appendChild).toHaveBeenCalledWith(expect.any(HTMLHeadingElement));
-      //expect(Elements.statusList.appendChild).toHaveBeenCalledWith(expect.any(HTMLLIElement));
+      expect(Elements.statusList.innerHTML).toBe("");
     });
+  });
 
-    it("should return early if game is null", () => {
-      mockGame = null;
-      updateBeeList();
+  describe("handleHitButtonClick", () => {
+    it("should start a new game if game is null", () => {
+      game = null;
+      handleHitButtonClick();
 
-      expect(Elements.statusList.innerHTML).toBe(""); 
-      expect(Elements.statusList.appendChild).not.toHaveBeenCalled();
+      // Check that BeeGame constructor is called to create a new game
+      expect(BeeGame).toHaveBeenCalledWith(expect.any(String)); // Ensures a player name was provided
+      expect(Elements.gameTitle.innerHTML).toContain("Welcome");
+      expect(Elements.hitButton.innerHTML).toBe("Hit");
     });
   });
 });

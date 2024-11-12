@@ -49,7 +49,7 @@ export class BeeGame {
   }
 
   public getBeesByType() {
-    return this.bees.reduce((acc, bee) => {
+    const beesByType = this.bees.reduce((acc, bee) => {
       const type = bee.constructor.name;
       if (!acc[type]) {
         acc[type] = { count: 0, bees: [] };
@@ -60,6 +60,8 @@ export class BeeGame {
       acc[type].bees.push({ health: bee.health });
       return acc;
     }, {} as Record<string, { count: number; bees: { health: number }[] }>);
+
+    return beesByType || {};
   }
 
   private initializeBees() {
